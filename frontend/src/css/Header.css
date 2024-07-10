@@ -3,6 +3,14 @@ a {
   text-decoration: none;
 }
 
+.header-bg-transparent {
+  background-color: transparent;
+}
+
+.header-bg-primary {
+  background-color: #0056b3;
+}
+
 .header {
   position: relative;
   z-index: 10;
@@ -14,13 +22,14 @@ a {
   color: white;
   border-bottom: 2px solid rgba(255, 255, 255, 0.15);
   padding: 0.7rem 0rem;
-  background-color: #007bff;
 }
 .header h1 {
   color: white;
 }
 .header p {
   color: white;
+  margin-block-end: 0rem;
+  margin-block-start: 0rem;
 }
 
 header {
@@ -40,6 +49,7 @@ header .nav-links a {
   color: white;
   text-decoration: none;
   padding: 0rem 1rem;
+  margin-left: 0.5rem;
 }
 header .nav-links a:first-child {
   border-right: 1px solid white;

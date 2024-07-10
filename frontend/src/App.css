@@ -24,11 +24,29 @@ h4 {
   margin-block-end: 0.5rem;
 }
 
+.page-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  max-width: 1200px;
+}
+
 .centered {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+.blue {
+  color: #007bff;
+}
+
+.plain-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .dark {
@@ -214,7 +232,42 @@ form button:hover {
 }
 
 .login-form {
-  max-width: 300px;
+  width: 250px;
+}
+
+.user-type-buttons {
+  display: flex;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+.user-type-buttons button {
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  background-color: rgba(0, 87, 179, 0.2156862745);
+  color: #606060;
+}
+.user-type-buttons button:hover {
+  background-color: rgba(255, 193, 7, 0.7568627451);
+}
+.user-type-buttons button:first-child {
+  border-radius: 3px 0px 0px 3px;
+}
+.user-type-buttons button:last-child {
+  border-radius: 0px 3px 3px 0px;
+}
+.user-type-buttons .selected:last-child {
+  background-color: #ffc107;
+  border-radius: 0px 3px 3px 0px;
+  color: #343a40;
+  font-weight: 600;
+}
+.user-type-buttons .selected:first-child {
+  border-radius: 3px 0px 0px 3px;
+  color: #343a40;
+  font-weight: 600;
+  background-color: #ffc107;
 }
 
 /*# sourceMappingURL=App.css.map */

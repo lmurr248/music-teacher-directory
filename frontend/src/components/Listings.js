@@ -66,7 +66,7 @@ const Listings = () => {
 
   return (
     <div>
-      <Header marginBottom={60} />
+      <Header marginBottom={60} backgroundColor={"#ffffff00"} />
 
       <div className="hero">
         <div className="hero-body">

@@ -7,6 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [userType, setUserType] = useState(3);
   const [isRegister, setIsRegister] = useState(false);
   const navigate = useNavigate();
 
@@ -24,7 +25,14 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        try {
+          localStorage.setItem("user", JSON.stringify(data));
+        } catch (storageError) {
+          console.error(
+            "Error saving user data to localStorage:",
+            storageError
+          );
+        }
         navigate("/dashboard");
       } else {
         const errorData = await response.json();
@@ -43,17 +51,28 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          userType: Number(userType),
+        }),
         credentials: "include",
       });
 
-      if (response.ok) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
         const data = await response.json();
-        console.log(data);
-        navigate("/dashboard");
+        if (response.ok) {
+          console.log(data);
+          navigate("/dashboard");
+        } else {
+          console.error(data.message);
+        }
       } else {
-        const errorData = await response.json();
-        console.error(errorData.message);
+        const text = await response.text();
+        console.error("Received non-JSON response:", text);
       }
     } catch (err) {
       console.error("Error registering:", err);
@@ -66,6 +85,21 @@ const Login = () => {
       <main className="login-page">
         <div className="login-form">
           <h1>{isRegister ? "Register" : "Log In"}</h1>
+          <p className="small">I am a...</p>
+          <div className="user-type-buttons">
+            <button
+              className={userType === 3 ? "selected" : ""}
+              onClick={() => setUserType(3)}
+            >
+              Student
+            </button>
+            <button
+              className={userType === 2 ? "selected" : ""}
+              onClick={() => setUserType(2)}
+            >
+              Teacher
+            </button>
+          </div>
           <form onSubmit={isRegister ? handleRegister : handleLogin}>
             {isRegister && (
               <>
@@ -113,10 +147,20 @@ const Login = () => {
             </div>
             <button type="submit">{isRegister ? "Register" : "Log In"}</button>
           </form>
-          <button onClick={() => setIsRegister(!isRegister)}>
-            {isRegister
-              ? "Already have an account? Log In"
-              : "Don't have an account? Register here"}
+          <button
+            className="plain-button"
+            onClick={() => setIsRegister(!isRegister)}
+          >
+            {isRegister ? (
+              <>
+                Already have an account? <span className="blue">Log In</span>
+              </>
+            ) : (
+              <>
+                Don't have an account?{" "}
+                <span className="blue">Register here</span>
+              </>
+            )}
           </button>
         </div>
       </main>

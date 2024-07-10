@@ -3,14 +3,12 @@ const app = express();
 const pool = require("./db"); // Corrected import
 const cors = require("cors");
 const dotenv = require("dotenv");
-
-// Import auth routes
+const session = require("express-session");
+const { passport } = require("./models/authModel");
+const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 
-// Load environment variables from .env file
-dotenv.config({
-  path: require("path").resolve(__dirname, "../.env"),
-});
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,6 +19,23 @@ app.use(
     credentials: true,
   })
 );
+
+// Set up session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // Set to true in production!
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Load environment variables from .env file
+dotenv.config({
+  path: require("path").resolve(__dirname, "../.env"),
+});
 
 // Get listings
 app.get("/api/listings", async (req, res) => {

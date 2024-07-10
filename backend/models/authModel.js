@@ -56,4 +56,43 @@ passport.use(
   )
 );
 
-module.exports = passport;
+const registerUser = (
+  firstName,
+  lastName,
+  email,
+  password,
+  userType,
+  callback
+) => {
+  // Generate a salt
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      return callback(err);
+    }
+    const salt = buffer.toString("hex");
+
+    // Hash the password
+    crypto.pbkdf2(password, salt, 100000, 64, "sha512", (err, derivedKey) => {
+      if (err) {
+        return callback(err);
+      }
+      const hashedPassword = derivedKey.toString("hex");
+
+      const userTypeNumber = Number(userType);
+
+      // Insert the new user into the database
+      pool.query(
+        "INSERT INTO users (first_name, last_name, email, password, user_type, salt) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        [firstName, lastName, email, hashedPassword, userTypeNumber, salt],
+        (err, result) => {
+          if (err) {
+            return callback(err);
+          }
+          callback(null, result.rows[0]);
+        }
+      );
+    });
+  });
+};
+
+module.exports = { passport, registerUser };
