@@ -1,0 +1,20 @@
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  padding: 0.7rem 0rem;
+}
+.header h1 {
+  color: white;
+}
+.header p {
+  color: white;
+}
+
+/*# sourceMappingURL=Header.css.map */
