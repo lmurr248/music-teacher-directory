@@ -1,3 +1,16 @@
+// Color variables
+$blue-main: #007bff;
+$blue-dark: #0056b3;
+$blue-light: #cce5ff;
+$dark-grey: #343a40;
+$light-grey: #f8f9fa;
+$yellow-main: #ffc107;
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
 .header {
   position: relative;
   z-index: 10;
@@ -9,10 +22,46 @@
   color: white;
   border-bottom: 2px solid rgba(255, 255, 255, 0.15);
   padding: 0.7rem 0rem;
+  background-color: #007bff;
   h1 {
     color: white;
   }
   p {
     color: white;
+  }
+}
+
+header {
+  color: white;
+  padding: 0rem 0rem 0rem 1rem;
+  h1 {
+    margin: 0;
+  }
+  .nav-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+
+    a {
+      color: white;
+      text-decoration: none;
+      padding: 0rem 1rem;
+
+      &:first-child {
+        border-right: 1px solid white;
+      }
+    }
+  }
+}
+
+#login-btn {
+  background-color: $yellow-main;
+  color: $dark-grey;
+  padding: 0.2rem 1rem;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+  &:hover {
+    background-color: #ffdb40;
   }
 }

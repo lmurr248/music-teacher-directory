@@ -20,6 +20,9 @@ const Header = ({ marginBottom, backgroundColor }) => {
         <div className="nav-links">
           <a href="#">Find Guitar Teachers</a>
           <a href="#">Teachers</a>
+          <a href="/login" id="login-btn">
+            Login
+          </a>
         </div>
       </div>
     </header>
