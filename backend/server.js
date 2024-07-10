@@ -4,6 +4,9 @@ const pool = require("./db"); // Corrected import
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+// Import auth routes
+const authRoutes = require("./routes/authRoutes");
+
 // Load environment variables from .env file
 dotenv.config({
   path: require("path").resolve(__dirname, "../.env"),
@@ -53,3 +56,6 @@ const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server has started on port ${PORT}`);
 });
+
+// Use the auth routes
+app.use("/api", authRoutes);
