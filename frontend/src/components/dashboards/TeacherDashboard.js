@@ -1,20 +1,24 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import ListingCard from "../listings/ListingCard";
 import "./dashboard.css";
 
 const TeacherDashboard = ({ user, listings }) => {
-  // Ensure listings is defined and has a length before rendering
-  if (!listings || listings.length === 0) {
+  // Ensure listings is an array and check if it has any items
+  if (!Array.isArray(listings) || listings.length === 0) {
     return (
       <div>
-        <div className="dashboard-header">
-          <h1>Teacher Dashboard</h1>
-          <button>Add Listing</button>
+        <div className="dashboard-header-container">
+          <div className="dashboard-header">
+            <h1>Teacher Dashboard</h1>
+            <Link to="/add-listing">
+              <button>Add Listing</button>
+            </Link>
+          </div>
         </div>
         <main>
-          <p>Welcome, {user.first_name}</p>
           <h2>Your Listings</h2>
-          <p>You have no listings</p>
+          <p>No listings found</p>
         </main>
       </div>
     );
@@ -27,19 +31,20 @@ const TeacherDashboard = ({ user, listings }) => {
           <h1>Teacher Dashboard</h1>
           <div className="menu">
             <div className="nav">
-              <a>Profile</a>
-              <a>Account</a>
+              <a href="#">Profile</a>
+              <a href="#">Account</a>
             </div>
-            <button>Add Listing</button>
+            <Link to="/add-listing">
+              <button>Add Listing</button>
+            </Link>
           </div>
         </div>
       </div>
       <main>
-        <p>Welcome, {user.first_name}</p>
         <h2>Your Listings</h2>
         <div className="listing-cards">
           {listings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing}></ListingCard>
+            <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
       </main>

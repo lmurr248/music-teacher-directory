@@ -20,7 +20,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "webpack serve --config webpack.config.js --mode development",
+    "start": "react-scripts start",
     "build": "webpack --config webpack.config.js --mode production",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -42,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
   }
 }

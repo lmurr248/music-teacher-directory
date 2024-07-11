@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Header from "../Header";
-import ListingCard from "../listings/ListingCard";
 import TeacherDashboard from "./TeacherDashboard";
 
 const Dashboard = () => {
@@ -43,9 +42,9 @@ const Dashboard = () => {
         const response = await fetch(`/api/listings/user/${userData.id}`, {
           credentials: "include",
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch user listings");
-        }
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch user listings");
+        // }
         const listingsData = await response.json();
         setListings(listingsData);
       } catch (err) {

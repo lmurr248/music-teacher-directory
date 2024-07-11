@@ -5,6 +5,7 @@
   display: flex;
   justify-content: center;
   height: 50px;
+  border-bottom: 1px solid #e2e2e2;
 }
 
 .dashboard-header {
@@ -25,6 +26,11 @@
   align-items: space-between;
   gap: 1rem;
 }
+.dashboard-header h1 {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 500;
+}
 
 button {
   background-color: #ffc107;
@@ -42,6 +48,11 @@ a {
 
 .listing-cards {
   padding: 2rem 0rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
 }
 
 /*# sourceMappingURL=dashboard.css.map */

@@ -4,8 +4,7 @@ import Listings from "./components/listings/Listings";
 import ListingDetails from "./components/listings/ListingDetails";
 import Login from "./components/Login";
 import Dashboard from "./components/dashboards/Dashboard";
-// import dotenv from "dotenv";
-// dotenv.config();
+import AddListing from "./components/listings/AddListing";
 
 function App() {
   return (
@@ -16,6 +15,7 @@ function App() {
           <Route path="/listing/:title" element={<ListingDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/add-listing" element={<AddListing />} />
         </Routes>
       </Router>
     </div>
