@@ -25,18 +25,11 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        try {
-          localStorage.setItem("user", JSON.stringify(data));
-        } catch (storageError) {
-          console.error(
-            "Error saving user data to localStorage:",
-            storageError
-          );
-        }
+        localStorage.setItem("user", JSON.stringify(data));
         navigate("/dashboard");
       } else {
         const errorData = await response.json();
-        console.error(errorData.message);
+        console.error("Login error:", errorData.message);
       }
     } catch (err) {
       console.error("Error logging in:", err);
@@ -61,18 +54,13 @@ const Login = () => {
         credentials: "include",
       });
 
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
+      if (response.ok) {
         const data = await response.json();
-        if (response.ok) {
-          console.log(data);
-          navigate("/dashboard");
-        } else {
-          console.error(data.message);
-        }
+        localStorage.setItem("user", JSON.stringify(data));
+        navigate("/dashboard");
       } else {
-        const text = await response.text();
-        console.error("Received non-JSON response:", text);
+        const errorData = await response.json();
+        console.error("Registration error:", errorData.message);
       }
     } catch (err) {
       console.error("Error registering:", err);

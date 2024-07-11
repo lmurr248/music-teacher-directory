@@ -1,9 +1,11 @@
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Listings from "./components/Listings";
-import ListingDetails from "./components/ListingDetails";
+import Listings from "./components/listings/Listings";
+import ListingDetails from "./components/listings/ListingDetails";
 import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./components/dashboards/Dashboard";
+// import dotenv from "dotenv";
+// dotenv.config();
 
 function App() {
   return (

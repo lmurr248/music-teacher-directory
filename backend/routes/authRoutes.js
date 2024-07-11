@@ -1,55 +1,65 @@
 const express = require("express");
-const { passport, registerUser } = require("../models/authModel");
+const router = express.Router();
+const authController = require("../controllers/authController");
 
-const authRouter = express.Router();
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.get("/logout", authController.logout);
 
-// Get a single user by id
-authRouter.get("/user/:id", (req, res) => {
-  console.log("req.user:", req.user);
-  const { id, first_name, last_name, email, user_type } = req.user || {};
-  res.json({ id, first_name, last_name, email, user_type });
-});
+module.exports = router;
 
-authRouter.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json(req.user);
-});
+// const express = require("express");
+// const { passport, registerUser } = require("../models/authModel");
 
-authRouter.post("/logout", (req, res) => {
-  req.logout();
-  res.clearCookie("connect.sid");
-  res.json({ message: "Logged out" });
-});
+// const authRouter = express.Router();
 
-authRouter.post("/register", (req, res) => {
-  const { firstName, lastName, email, password, userType } = req.body;
-  const userTypeNumber = Number(userType);
-  registerUser(
-    firstName,
-    lastName,
-    email,
-    password,
-    userTypeNumber,
-    (err, user) => {
-      if (err) {
-        console.error("Error registering user:", err);
-        return res
-          .status(500)
-          .json({ message: "Error registering user", error: err.message });
-      }
+// // Get a single user by id
+// authRouter.get("/user/:id", (req, res) => {
+//   console.log("req.user:", req.user);
+//   const { id, first_name, last_name, email, user_type } = req.user || {};
+//   res.json({ id, first_name, last_name, email, user_type });
+// });
 
-      // Automatically log in the user after registration
-      req.login(user, (err) => {
-        if (err) {
-          console.error("Error logging in user after registration:", err);
-          return res.status(500).json({
-            message: "Error logging in user after registration",
-            error: err.message,
-          });
-        }
-        return res.status(201).json(user);
-      });
-    }
-  );
-});
+// authRouter.post("/login", passport.authenticate("local"), (req, res) => {
+//   res.json(req.user);
+// });
 
-module.exports = authRouter;
+// authRouter.post("/logout", (req, res) => {
+//   req.logout();
+//   res.clearCookie("connect.sid");
+//   res.json({ message: "Logged out" });
+// });
+
+// authRouter.post("/register", (req, res) => {
+//   const { firstName, lastName, email, password, userType } = req.body;
+//   const userTypeNumber = Number(userType);
+//   registerUser(
+//     firstName,
+//     lastName,
+//     email,
+//     password,
+//     userTypeNumber,
+//     (err, user) => {
+//       if (err) {
+//         console.error("Error registering user:", err);
+//         return res
+//           .status(500)
+//           .json({ message: "Error registering user", error: err.message });
+//       }
+
+//       // Automatically log in the user after registration
+//       req.login(user, (err) => {
+//         if (err) {
+//           console.error("Error logging in user after registration:", err);
+//           return res.status(500).json({
+//             message: "Error logging in user after registration",
+//             error: err.message,
+//           });
+//         }
+//         return res.status(201).json(user);
+//       });
+//     }
+//   );
+// });
+
+// module.exports = authRouter;

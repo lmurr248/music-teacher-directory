@@ -47,21 +47,26 @@ const Header = ({ marginBottom, backgroundColor }) => {
         </Link>
 
         <div className="nav-links">
-          <a href="#">Find Guitar Teachers</a>
-          <a href="#">Teachers</a>
           {isLoggedIn && (
             <div className="user-info small">
               <p>Hi, {JSON.parse(localStorage.getItem("user")).first_name}</p>
             </div>
           )}
           {isLoggedIn ? (
-            <a onClick={handleLogout} href="/login" id="login-btn">
-              Log Out
-            </a>
+            <div className="nav-logged-in">
+              <Link to="/dashboard">Dashboard</Link>
+              <a onClick={handleLogout} href="/login" id="login-btn">
+                Log Out
+              </a>
+            </div>
           ) : (
-            <a href="/login" id="login-btn">
-              Log In
-            </a>
+            <div className="nav-logged-out">
+              <a href="#">Find Guitar Teachers</a>
+              <a href="#">Teachers</a>
+              <a href="/login" id="login-btn">
+                Log In
+              </a>
+            </div>
           )}
         </div>
       </div>

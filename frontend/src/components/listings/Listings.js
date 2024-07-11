@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchListings } from "../slices/listingsSlice";
+import { fetchListings } from "../../slices/listingsSlice";
 import { Link } from "react-router-dom";
-import Header from "./Header";
+import Header from "../Header";
+import ListingCard from "./ListingCard";
 
 // Helper function to normalise titles
-const normaliseTitle = (title) => title.toLowerCase().replace(/\s/g, "-");
+export const normaliseTitle = (title) =>
+  title.toLowerCase().replace(/\s/g, "-");
 
 const Listings = () => {
   const dispatch = useDispatch();
@@ -29,34 +31,7 @@ const Listings = () => {
     content = (
       <div className="listing-container">
         {listings.map((listing) => (
-          <Link to={`/listing/${normaliseTitle(listing.title)}`}>
-            <div key={listing.id} className="card">
-              <div className="card-image">
-                <img
-                  src={listing.banner_image}
-                  alt={listing.title}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "fallback-image-url.jpg";
-                  }}
-                />
-              </div>
-              <div className="main-image">
-                <img
-                  src={listing.main_image}
-                  alt={listing.title}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "fallback-image-url.jpg";
-                  }}
-                />
-              </div>
-              <div className="card-header">
-                <h3>{listing.title}</h3>
-                <p>{listing.description}</p>
-              </div>
-            </div>
-          </Link>
+          <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
     );
@@ -66,7 +41,8 @@ const Listings = () => {
 
   return (
     <div>
-      <Header marginBottom={60} backgroundColor={"#ffffff00"} />
+      <Header marginBottom={60} backgroundColor={"transparent"} />
+      <ListingCard listing={listings} />
 
       <div className="hero">
         <div className="hero-body">

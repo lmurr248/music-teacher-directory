@@ -1,9 +1,12 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchListingById, clearSingleListing } from "../slices/listingsSlice";
-import "../css/ListingDetails.css";
-import Header from "./Header";
+import {
+  fetchListingById,
+  clearSingleListing,
+} from "../../slices/listingsSlice";
+import "../../css/ListingDetails.css";
+import Header from "../Header";
 
 // Helper function to normalize titles
 const normalizeTitle = (title) => title.toLowerCase().replace(/ /g, "-");
