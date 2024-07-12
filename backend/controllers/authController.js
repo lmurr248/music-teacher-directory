@@ -34,12 +34,12 @@ exports.login = (req, res, next) => {
       const token = jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_SECRET,
-        { expiresIn: "24h" } // expires in 24 hours
+        { expiresIn: "24h" }
       );
 
-      return res.json({ token }); // Send the token to the client
-    });
-  })(req, res, next);
+      return res.json({ token });
+    })(req, res, next);
+  });
 };
 
 // exports.login = (req, res, next) => {

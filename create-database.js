@@ -67,16 +67,15 @@ const createDatabaseAndTables = async () => {
             last_name VARCHAR(100) NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
-            salt VARCHAR(255) NOT NULL,
             user_type INTEGER REFERENCES user_types(id),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         -- Insert sample data into users
-        INSERT INTO users (first_name, last_name, email, password, salt, user_type) VALUES
-        ('John', 'Doe', 'john.doe@example.com', 'password123', 'salt123', 1),
-        ('Jane', 'Smith', 'jane.smith@example.com', 'password456', 'salt456', 2),
-        ('Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 'salt789', 3)
+        INSERT INTO users (first_name, last_name, email, password, user_type) VALUES
+        ('John', 'Doe', 'john.doe@example.com', 'password123', 1),
+        ('Jane', 'Smith', 'jane.smith@example.com', 'password456', 2),
+        ('Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 3)
         ON CONFLICT DO NOTHING;
 
         -- Create table listings

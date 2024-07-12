@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const pool = require("./db");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const session = require("express-session");
@@ -18,16 +17,28 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(flash());
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-);
+const whitelist = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://music-teacher-directory-frontend.onrender.com",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log(`Origin: ${origin}`); // Log the origin for debugging
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      console.log(`Blocked by CORS: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // This allows cookies to be sent
+};
+
+app.use(cors(corsOptions));
 
 // Set up session middleware
 app.use(
@@ -42,7 +53,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Use the user routes
-app.use("/api/user", userRoutes);
 app.use("/api/user", userRoutes);
 
 // Use the auth routes

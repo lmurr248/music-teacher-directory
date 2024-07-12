@@ -32,7 +32,7 @@ const Header = ({ marginBottom, backgroundColor }) => {
           "Content-Type": "application/json",
         },
       });
-      if (!response.ok) throw new Error("Failed to fetch user details.");
+
       const userData = await response.json();
       setUserName(userData.first_name); // Assuming the API returns an object with a first_name property
     } catch (error) {
