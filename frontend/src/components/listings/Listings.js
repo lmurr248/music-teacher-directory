@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchListings } from "../../slices/listingsSlice";
-import { Link } from "react-router-dom";
+
 import Header from "../Header";
 import ListingCard from "./ListingCard";
+import HomePageSearch from "../searchBars/HomePageSearch";
 
 // Helper function to normalise titles
 export const normaliseTitle = (title) =>
@@ -42,21 +43,7 @@ const Listings = () => {
   return (
     <div>
       <Header marginBottom={60} backgroundColor={"transparent"} />
-      <ListingCard listing={listings} />
-
-      <div className="hero">
-        <div className="hero-body">
-          <h2>Find a Guitar Teacher Near You</h2>
-          <p>
-            Connect with guitar teachers in your area. Sign up today to find the
-            perfect teacher for you!
-          </p>
-          <div className="search">
-            <input type="text" placeholder="Enter your location" />
-            <button>Search</button>
-          </div>
-        </div>
-      </div>
+      <HomePageSearch />
       <main>
         <h2 className="centered mg-top">Featured Guitar Teachers</h2>
         {content}

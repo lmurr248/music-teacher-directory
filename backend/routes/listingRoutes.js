@@ -1,57 +1,49 @@
-// listingRoutes.js
-
 const express = require("express");
 const router = express.Router();
-const pool = require("../db");
+const listingsController = require("../controllers/listingsController");
+const { authenticateToken } = require("../middlewares/authMiddleware");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-// Get all listings
-router.get("/", async (req, res) => {
-  try {
-    const listings = await pool.query("SELECT * FROM listings");
-    res.json(listings.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-    console.error(err.message);
-  }
-});
+// GET all listings
+router.get("/", listingsController.getListings);
 
-// Get a single listing by ID
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query("SELECT * FROM listings WHERE id = $1", [
-      id,
-    ]);
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ error: "Listing not found" });
-    }
-  } catch (err) {
-    console.error(`Error fetching listing by ID: ${err.message}`);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+// GET listing by ID
+router.get("/:id", listingsController.getListingById);
 
-// Get listings associated with a user
-router.get("/user/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const listings = await pool.query(
-      "SELECT * FROM listings WHERE user_id = $1",
-      [id]
-    );
-    if (listings.rows.length > 0) {
-      res.json(listings.rows);
-    } else {
-      res
-        .status(404)
-        .json({ error: `No listings found for user with id ${id}` });
-    }
-  } catch (err) {
-    console.error(`Error fetching listings by user ID: ${err.message}`);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+// GET listings by user ID
+router.get("/user/:id", listingsController.getListingsByUserId);
+
+// POST create a new listing
+router.post(
+  "/",
+  authenticateToken,
+  upload.fields([
+    { name: "banner_image", maxCount: 1 },
+    { name: "main_image", maxCount: 1 },
+  ]),
+  listingsController.createListing
+);
+
+// PUT update a listing by ID
+router.put(
+  "/:id",
+  authenticateToken,
+  upload.none(),
+  listingsController.updateListing
+);
+
+// GET categories by listing ID
+router.get(
+  "/categories/:listingId",
+  listingsController.getCategoriesByListingId
+);
+
+// GET instruments by listing ID
+router.get(
+  "/instruments/:listingId",
+  listingsController.getInstrumentsByListingId
+);
 
 module.exports = router;

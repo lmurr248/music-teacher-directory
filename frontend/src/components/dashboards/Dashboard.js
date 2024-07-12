@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../Header";
-import ListingCard from "../listings/ListingCard";
 import TeacherDashboard from "./TeacherDashboard";
+import { jwtDecode } from "jwt-decode";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -11,16 +11,20 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication token not found");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const userDataString = localStorage.getItem("user");
-        if (!userDataString) {
-          throw new Error("User data not found in localStorage");
-        }
-        const userData = JSON.parse(userDataString);
-        const userId = userData.id;
+        const decoded = jwtDecode(token);
+        const userId = decoded.id;
         const response = await fetch(`/api/user/${userId}`, {
-          credentials: "include",
+          headers: { Authorization: `Bearer ${token}` },
         });
+
         if (!response.ok) {
           throw new Error("Failed to fetch user data");
         }
@@ -37,12 +41,15 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchUserListings = async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/listings/user/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       try {
-        const userData = JSON.parse(localStorage.getItem("user"));
-        const response = await fetch(`/api/listings/user/${userData.id}`, {
-          credentials: "include",
-        });
         if (!response.ok) {
           throw new Error("Failed to fetch user listings");
         }
@@ -56,13 +63,17 @@ const Dashboard = () => {
     };
 
     fetchUserListings();
-  }, []);
+  }, [user]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!user) return <div>No user data found</div>;
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error}</div>;
+  // if (!user) return <div>No user data found</div>;
+
+  console.log(user);
 
   const renderUserContent = () => {
+    if (!user) return <div>Loading user details...</div>;
+
     switch (user.user_type) {
       case 1:
         return (
@@ -72,7 +83,6 @@ const Dashboard = () => {
         );
       case 2:
         return <TeacherDashboard user={user} listings={listings} />;
-
       case 3:
         return <h1>Student Dashboard</h1>;
       default:
@@ -83,7 +93,6 @@ const Dashboard = () => {
   return (
     <div>
       <Header />
-
       <div className="listings">{renderUserContent()}</div>
     </div>
   );

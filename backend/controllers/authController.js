@@ -19,17 +19,40 @@ exports.register = async (req, res) => {
 };
 
 // Login controller
+const jwt = require("jsonwebtoken");
+
 exports.login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
     if (!user)
       return res.status(400).json({ message: "Invalid email or password" });
+
     req.logIn(user, (err) => {
       if (err) return next(err);
-      return res.json(user);
+
+      // Generate a token
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" } // expires in 24 hours
+      );
+
+      return res.json({ token }); // Send the token to the client
     });
   })(req, res, next);
 };
+
+// exports.login = (req, res, next) => {
+//   passport.authenticate("local", (err, user, info) => {
+//     if (err) return next(err);
+//     if (!user)
+//       return res.status(400).json({ message: "Invalid email or password" });
+//     req.logIn(user, (err) => {
+//       if (err) return next(err);
+//       return res.json(user);
+//     });
+//   })(req, res, next);
+// };
 
 // Logout controller
 exports.logout = (req, res) => {

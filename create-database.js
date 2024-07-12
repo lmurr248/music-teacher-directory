@@ -97,12 +97,12 @@ const createDatabaseAndTables = async () => {
             user_id INTEGER REFERENCES users(id),
             title VARCHAR(200) NOT NULL,
             description TEXT NOT NULL,
-            main_image VARCHAR(255) DEFAULT 'https://example.com/placeholder.jpg',
-            banner_image VARCHAR(255) DEFAULT 'https://example.com/placeholder.jpg',
+            main_image VARCHAR DEFAULT 'https://example.com/placeholder.jpg',
+            banner_image VARCHAR DEFAULT 'https://example.com/placeholder.jpg',
             package_id INTEGER REFERENCES packages(id),
-            categories VARCHAR(255),
-            instruments VARCHAR(255),
-            ages VARCHAR(255)
+            categories VARCHAR,
+            instruments VARCHAR,
+            ages VARCHAR
         );
 
         -- Insert sample data into listings

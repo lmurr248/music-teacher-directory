@@ -7,7 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [userType, setUserType] = useState(3);
+  const [userType, setUserType] = useState(3); // Assuming '3' is a default user type
   const [isRegister, setIsRegister] = useState(false);
   const navigate = useNavigate();
 
@@ -20,12 +20,11 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include",
       });
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data));
+        const { token } = await response.json();
+        localStorage.setItem("token", token); // Store the JWT token in localStorage
         navigate("/dashboard");
       } else {
         const errorData = await response.json();
@@ -51,13 +50,12 @@ const Login = () => {
           password,
           userType: Number(userType),
         }),
-        credentials: "include",
       });
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data));
-        navigate("/dashboard");
+        const { token } = await response.json();
+        localStorage.setItem("token", token); // Store the JWT token in localStorage
+        navigate("/dashboard"); // Navigate to the dashboard after registration
       } else {
         const errorData = await response.json();
         console.error("Registration error:", errorData.message);

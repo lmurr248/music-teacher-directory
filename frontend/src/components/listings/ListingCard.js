@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../App.css";
+import useCategories from "../../helpers/fetchCategories";
+import useInstruments from "../../helpers/useInstruments";
 
 // Helper function to normalise titles
 const normaliseTitle = (title) => {
@@ -9,9 +11,14 @@ const normaliseTitle = (title) => {
 };
 
 const ListingCard = ({ listing }) => {
-  if (!listing || !listing.title) {
-    return null; // or handle the case where listing or title is not available
-  }
+  const { categories } = useCategories(listing.id);
+  const { instruments } = useInstruments(listing.id);
+
+  const displayedInstruments = instruments.slice(0, 2);
+  const extraInstruments = instruments.length - 2;
+
+  const displayedCategories = categories.slice(0, 3);
+  const extraCategories = categories.length - 3;
 
   return (
     <Link to={`/listing/${normaliseTitle(listing.title)}`}>
@@ -25,6 +32,22 @@ const ListingCard = ({ listing }) => {
               e.target.src = "fallback-image-url.jpg";
             }}
           />
+          {instruments.length > 0 ? (
+            <div className="instrument-list">
+              {displayedInstruments.map((instrument) => (
+                <span key={instrument.id} className="instrument-item">
+                  {instrument.name}
+                </span>
+              ))}
+              {extraInstruments > 0 && (
+                <span className="instrument-item">+{extraInstruments}</span>
+              )}
+            </div>
+          ) : (
+            <div className="instrument-list">
+              <span className="instrument-item">No instruments found</span>
+            </div>
+          )}
         </div>
         <div className="main-image">
           <img
@@ -40,6 +63,26 @@ const ListingCard = ({ listing }) => {
           <h3>{listing.title}</h3>
           <p>{listing.description}</p>
         </div>
+        {categories.length > 0 ? (
+          <div className="card-footer">
+            <div className="category-list">
+              {displayedCategories.map((category) => (
+                <span key={category.id} className="category-item">
+                  {category.name}
+                </span>
+              ))}
+              {extraCategories > 0 && (
+                <span className="category-item">+{extraCategories}</span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="card-footer">
+            <div className="category-list">
+              <span className="category-item">No categories found</span>
+            </div>
+          </div>
+        )}
       </div>
     </Link>
   );
