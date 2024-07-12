@@ -18,6 +18,8 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(flash());
 
 app.use(
@@ -40,6 +42,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Use the user routes
+app.use("/api/user", userRoutes);
 app.use("/api/user", userRoutes);
 
 // Use the auth routes

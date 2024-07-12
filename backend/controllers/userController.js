@@ -1,14 +1,11 @@
 const pool = require("../db");
 
-const getUserById = async (id) => {
+exports.getUserById = async (id) => {
   try {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     return result.rows[0];
-  } catch (error) {
-    throw new Error(`Error fetching user by ID: ${error.message}`);
+  } catch (err) {
+    console.error(`Error fetching user by ID: ${err.message}`);
+    throw err;
   }
-};
-
-module.exports = {
-  getUserById,
 };
