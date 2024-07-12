@@ -12,13 +12,14 @@ const AddListing = () => {
   const query = useQuery();
   const id = query.get("id");
   const [title, setTitle] = useState("");
+  const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
   const [mainImage, setMainImage] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedInstruments, setSelectedInstruments] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState("London");
+  const [selectedLocation, setSelectedLocation] = useState(0);
   const [locations, setLocations] = useState([]);
   const [instruments, setInstruments] = useState([]);
   const [newLocation, setNewLocation] = useState("");
@@ -37,7 +38,7 @@ const AddListing = () => {
 
   // Fetch categories
   useEffect(() => {
-    if (!currentUser) return; // Guard against null currentUser
+    if (!currentUser || !currentUser.id) return;
 
     const fetchCategories = async () => {
       try {
@@ -75,35 +76,53 @@ const AddListing = () => {
     };
     fetchLocations();
 
+    const fetchLocationByListingId = async () => {
+      try {
+        const response = await fetch(`/api/locations/listing/${id}`);
+        if (!response.ok) throw new Error("Failed to fetch location");
+        const location = await response.json();
+        setSelectedLocation(location[0]);
+      } catch (err) {
+        console.error(err.message);
+      }
+    };
+    fetchLocationByListingId();
+
     if (id) {
       const fetchListing = async () => {
         try {
           const response = await fetch(`/api/listings/${id}`);
           if (!response.ok) throw new Error("Failed to fetch listing");
           const listing = await response.json();
-          if (listing.user_id === currentUser.id) {
-            // Ensure currentUser is not null
+          // Check user_id match before setting state
+          if (listing.user_id !== currentUser.id) {
+            navigate("/add-listing");
+          } else {
             setTitle(listing.title);
+            setTagline(listing.tagline);
             setDescription(listing.description);
             setBannerImage(listing.banner_image);
             setMainImage(listing.main_image);
             setSelectedCategories(listing.categories || []);
             setSelectedInstruments(listing.instruments || []);
-            setSelectedLocation(listing.location || "London");
-          } else {
-            navigate("/add-listing"); // Redirect or show an error message
           }
         } catch (err) {
           console.error(err.message);
+
+          navigate("/add-listing");
         }
       };
       fetchListing();
     }
-  }, [id, currentUser]);
+  }, [currentUser, id, navigate]);
 
   // Handle title input changes
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
+  };
+
+  const handleTaglineChange = (e) => {
+    setTagline(e.target.value);
   };
 
   // Handle description input changes
@@ -173,9 +192,9 @@ const AddListing = () => {
     try {
       const userId = currentUser.id;
       const newLocationData = newLocation ? { name: newLocation } : null;
-
       let endpoint = "/api/listings";
       let method = "POST";
+
       if (id) {
         endpoint = `/api/listings/${id}`;
         method = "PUT";
@@ -197,6 +216,7 @@ const AddListing = () => {
           instruments: selectedInstruments,
           location: selectedLocation,
           new_location: newLocationData,
+          tagline,
         }),
       });
 
@@ -234,7 +254,20 @@ const AddListing = () => {
               value={title}
               onChange={handleTitleChange}
               placeholder="Listing title"
+              required
             />
+            <label htmlFor="tagline">Tagline</label>
+            <input
+              type="text"
+              id="tagline"
+              name="tagline"
+              value={tagline}
+              onChange={handleTaglineChange}
+              placeholder="Listing title"
+              maxLength={50}
+              required
+            />
+            <div className="char-counter">{tagline?.length}/50</div>
             <label htmlFor="description">Description</label>
             <textarea
               id="description"
@@ -242,6 +275,7 @@ const AddListing = () => {
               value={description}
               onChange={handleDescriptionChange}
               placeholder="Enter the main text for your listings here..."
+              required
             ></textarea>
             <label htmlFor="banner_image">Banner Image</label>
             <input
@@ -249,6 +283,7 @@ const AddListing = () => {
               id="banner_image"
               name="banner_image"
               onChange={handleBannerImageChange}
+              required
             />
             <label htmlFor="main_image">Main Image</label>
             <input
@@ -256,6 +291,7 @@ const AddListing = () => {
               id="main_image"
               name="main_image"
               onChange={handleMainImageChange}
+              required
             />
             <label htmlFor="categories">Categories</label>
             <select
@@ -263,6 +299,7 @@ const AddListing = () => {
               name="categories"
               multiple
               onChange={handleSelectCategories}
+              required
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -276,6 +313,7 @@ const AddListing = () => {
               name="instruments"
               multiple
               onChange={handleSelectInstruments}
+              required
             >
               {instruments.map((instrument) => (
                 <option key={instrument.id} value={instrument.id}>
@@ -289,13 +327,13 @@ const AddListing = () => {
               id="location"
               name="location"
               onChange={handleLocationChange}
-              defaultValue=""
+              value={selectedLocation}
+              required
             >
               <option value="" disabled>
                 Select a location...
               </option>
               <option value="Add New">Add New</option>
-              {/*Map over locations*/}
               {locations.map((location) => (
                 <option key={location.id} value={location.id}>
                   {location.name}
@@ -315,7 +353,9 @@ const AddListing = () => {
               </div>
             )}
 
-            <button type="submit">Add Listing</button>
+            <button type="submit">
+              {id ? "Update Listing" : "Add Listing"}
+            </button>
           </form>
         </div>
       </main>

@@ -50,19 +50,10 @@ const Dashboard = () => {
       });
 
       try {
-<<<<<<< HEAD
         if (!response.ok) {
           throw new Error("Failed to fetch user listings");
         }
-=======
-        const userData = JSON.parse(localStorage.getItem("user"));
-        const response = await fetch(`/api/listings/user/${userData.id}`, {
-          credentials: "include",
-        });
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch user listings");
-        // }
->>>>>>> 93b7a0fe0f9272132d5edba87bb49baab335f6f7
+
         const listingsData = await response.json();
         setListings(listingsData);
       } catch (err) {

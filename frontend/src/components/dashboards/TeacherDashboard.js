@@ -1,36 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Link } from "react-router-dom";
 import ListingCard from "../listings/ListingCard";
 import "./dashboard.css";
 
 const TeacherDashboard = ({ user, listings }) => {
   // Ensure listings is an array and check if it has any items
   if (!Array.isArray(listings) || listings.length === 0) {
-  // Ensure listings is an array and check if it has any items
-  if (!Array.isArray(listings) || listings.length === 0) {
     return (
       <div>
-        <div className="dashboard-header-container">
-          <div className="dashboard-header">
-            <h1>Teacher Dashboard</h1>
-            <Link to="/add-listing">
-              <button>Add Listing</button>
-            </Link>
+        <div>
+          <div className="dashboard-header-container">
+            <div className="dashboard-header">
+              <h1>Teacher Dashboard</h1>
+              <Link to="/add-listing">
+                <button>Add Listing</button>
+              </Link>
+            </div>
           </div>
-        <div className="dashboard-header-container">
-          <div className="dashboard-header">
-            <h1>Teacher Dashboard</h1>
-            <Link to="/add-listing">
-              <button>Add Listing</button>
-            </Link>
-          </div>
+          <main>
+            <h2>Your Listings</h2>
+            <p>No listings found</p>
+          </main>
         </div>
-        <main>
-          <h2>Your Listings</h2>
-          <p>No listings found</p>
-          <p>No listings found</p>
-        </main>
       </div>
     );
   }
@@ -44,12 +35,7 @@ const TeacherDashboard = ({ user, listings }) => {
             <div className="nav">
               <a href="#">Profile</a>
               <a href="#">Account</a>
-              <a href="#">Profile</a>
-              <a href="#">Account</a>
             </div>
-            <Link to="/add-listing">
-              <button>Add Listing</button>
-            </Link>
             <Link to="/add-listing">
               <button>Add Listing</button>
             </Link>

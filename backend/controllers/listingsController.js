@@ -67,6 +67,7 @@ exports.createListing = async (req, res) => {
       instruments,
       location,
       new_location,
+      tagline,
     } = req.body;
 
     let selectedLocationId = location;
@@ -82,8 +83,8 @@ exports.createListing = async (req, res) => {
 
     // Insert the new listing
     const newListingResult = await client.query(
-      "INSERT INTO listings (user_id, title, description, banner_image, main_image) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-      [user_id, title, description, banner_image, main_image]
+      "INSERT INTO listings (user_id, title, description, banner_image, main_image, tagline) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+      [user_id, title, description, banner_image, main_image, tagline]
     );
 
     const newListingId = newListingResult.rows[0].id;
@@ -154,6 +155,19 @@ exports.updateListing = async (req, res) => {
     await client.query("BEGIN");
 
     const { id } = req.params;
+    const {
+      title,
+      description,
+      banner_image,
+      main_image,
+      categories,
+      instruments,
+      location,
+      new_location,
+      tagline, // Ensure this is being sent in the request body
+    } = req.body;
+
+    let selectedLocationId = location;
 
     // Fetch existing listing to check ownership
     const existingListingResult = await client.query(
@@ -173,71 +187,65 @@ exports.updateListing = async (req, res) => {
         .json({ error: "Unauthorized to update this listing" });
     }
 
-    // Update listing details
-    const {
-      title,
-      description,
-      banner_image,
-      main_image,
-      categories,
-      instruments,
-      location,
-      new_location,
-    } = req.body;
-
+    // Update the main listing details
     await client.query(
-      "UPDATE listings SET title = $1, description = $2, banner_image = $3, main_image = $4 WHERE id = $5",
-      [title, description, banner_image, main_image, id]
+      "UPDATE listings SET title = $1, description = $2, banner_image = $3, main_image = $4, tagline = $5 WHERE id = $6",
+      [title, description, banner_image, main_image, tagline, id]
     );
 
-    // Update categories associated with the listing
-    if (categories && categories.length > 0) {
-      // Delete existing associations
+    // If a new location is provided, create it and get its ID
+    if (new_location) {
+      const newLocationResult = await client.query(
+        "INSERT INTO locations (name) VALUES ($1) RETURNING id",
+        [new_location.name]
+      );
+      selectedLocationId = newLocationResult.rows[0].id;
+    }
+
+    // Update the location in the junction table
+    await client.query("DELETE FROM listing_locations WHERE listing_id = $1", [
+      id,
+    ]);
+    if (selectedLocationId) {
+      await client.query(
+        "INSERT INTO listing_locations (listing_id, location_id) VALUES ($1, $2)",
+        [id, selectedLocationId]
+      );
+    }
+
+    // Handle categories
+    if (categories) {
       await client.query(
         "DELETE FROM listing_categories WHERE listing_id = $1",
         [id]
       );
-
-      // Insert new associations
-      const categoryValues = categories
-        .map((category_id) => `(${id}, ${category_id})`)
-        .join(", ");
-      await client.query(`
-        INSERT INTO listing_categories (listing_id, category_id)
-        VALUES ${categoryValues}
-      `);
+      categories.forEach(async (category_id) => {
+        await client.query(
+          "INSERT INTO listing_categories (listing_id, category_id) VALUES ($1, $2)",
+          [id, category_id]
+        );
+      });
     }
 
-    // Update instruments associated with the listing
-    if (instruments && instruments.length > 0) {
-      // Delete existing associations
+    // Handle instruments
+    if (instruments) {
       await client.query(
         "DELETE FROM listing_instruments WHERE listing_id = $1",
-        [newListingId]
+        [id]
       );
-
-      // Insert new associations
-      const instrumentValues = instruments
-        .map((instrument_id) => `(${newListingId}, ${instrument_id})`)
-        .join(", ");
-      await client.query(`
-    INSERT INTO listing_instruments (listing_id, instrument_id)
-    VALUES ${instrumentValues}
-  `);
+      instruments.forEach(async (instrument_id) => {
+        await client.query(
+          "INSERT INTO listing_instruments (listing_id, instrument_id) VALUES ($1, $2)",
+          [id, instrument_id]
+        );
+      });
     }
-
-    // Update location associated with the listing
-    await client.query("DELETE FROM listing_locations WHERE listing_id = $1", [
-      newListingId,
-    ]);
-    await client.query(
-      "INSERT INTO listing_locations (listing_id, location_id) VALUES ($1, $2)",
-      [newListingId, selectedLocationId]
-    );
 
     await client.query("COMMIT");
 
-    res.status(200).json({ id, ...req.body });
+    res
+      .status(200)
+      .json({ message: "Listing updated successfully", id: id, ...req.body });
   } catch (err) {
     await client.query("ROLLBACK");
     console.error(`Error updating listing: ${err.message}`);
