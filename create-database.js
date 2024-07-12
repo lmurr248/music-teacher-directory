@@ -1,4 +1,4 @@
-// First create a Postges datacase, enter the credentials in the .env file and install the pg module
+// First create a Postgres database, enter the credentials in the .env file and install the pg module
 // Then add the below to your package.json file:
 // "scripts": {
 //   "create-db": "node create-database.js"
@@ -49,7 +49,8 @@ const createDatabaseAndTables = async () => {
         -- Create table user_types
         CREATE TABLE IF NOT EXISTS user_types (
             id SERIAL PRIMARY KEY,
-            type VARCHAR(50) NOT NULL
+            type VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         -- Insert sample data into user_types
@@ -57,20 +58,6 @@ const createDatabaseAndTables = async () => {
         ('admin'),
         ('teacher'),
         ('student')
-        ON CONFLICT DO NOTHING;
-
-        -- Create table packages
-        CREATE TABLE IF NOT EXISTS packages (
-            id SERIAL PRIMARY KEY,
-            package_name VARCHAR(100) NOT NULL,
-            price NUMERIC(10, 2) NOT NULL
-        );
-
-        -- Insert sample data into packages
-        INSERT INTO packages (package_name, price) VALUES
-        ('Basic Package', 29.99),
-        ('Standard Package', 49.99),
-        ('Premium Package', 79.99)
         ON CONFLICT DO NOTHING;
 
         -- Create table users
@@ -81,35 +68,121 @@ const createDatabaseAndTables = async () => {
             email VARCHAR(100) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             salt VARCHAR(255) NOT NULL,
-            user_type INTEGER REFERENCES user_types(id)
+            user_type INTEGER REFERENCES user_types(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         -- Insert sample data into users
-        INSERT INTO users (first_name, last_name, email, password, user_type) VALUES
-        ('John', 'Doe', 'john.doe@example.com', 'password123', 1),
-        ('Jane', 'Smith', 'jane.smith@example.com', 'password456', 2),
-        ('Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 3)
+        INSERT INTO users (first_name, last_name, email, password, salt, user_type) VALUES
+        ('John', 'Doe', 'john.doe@example.com', 'password123', 'salt123', 1),
+        ('Jane', 'Smith', 'jane.smith@example.com', 'password456', 'salt456', 2),
+        ('Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 'salt789', 3)
         ON CONFLICT DO NOTHING;
 
         -- Create table listings
         CREATE TABLE IF NOT EXISTS listings (
             id SERIAL PRIMARY KEY,
             user_id INTEGER REFERENCES users(id),
-            title VARCHAR(200) NOT NULL,
+            title VARCHAR(50) NOT NULL,
             description TEXT NOT NULL,
             main_image VARCHAR DEFAULT 'https://example.com/placeholder.jpg',
             banner_image VARCHAR DEFAULT 'https://example.com/placeholder.jpg',
-            package_id INTEGER REFERENCES packages(id),
-            categories VARCHAR,
-            instruments VARCHAR,
-            ages VARCHAR
+            tagline VARCHAR(50),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Create table categories
+        CREATE TABLE IF NOT EXISTS categories (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Insert sample data into categories
+        INSERT INTO categories (name) VALUES
+        ('Rock'),
+        ('Jazz'),
+        ('Metal'),
+        ('Pop'),
+        ('Fingerstyle')
+        ON CONFLICT DO NOTHING;
+
+        -- Create table instruments
+        CREATE TABLE IF NOT EXISTS instruments (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Insert sample data into instruments
+        INSERT INTO instruments (name) VALUES
+        ('Acoustic Guitar'),
+        ('Electric Guitar'),
+        ('Bass Guitar'),
+        ('Ukulele'),
+        ('Classical Guitar')
+        ON CONFLICT DO NOTHING;
+
+        -- Create table locations
+        CREATE TABLE IF NOT EXISTS locations (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Insert sample data into locations
+        INSERT INTO locations (name) VALUES
+        ('London'),
+        ('Birmingham'),
+        ('Manchester'),
+        ('Glasgow'),
+        ('Liverpool'),
+        ('Newcastle'),
+        ('Bristol'),
+        ('Leeds'),
+        ('Sheffield'),
+        ('Edinburgh'),
+        ('Leicester'),
+        ('Coventry'),
+        ('Nottingham'),
+        ('Hull'),
+        ('Cardiff'),
+        ('Southampton'),
+        ('Portsmouth'),
+        ('Brighton'),
+        ('Reading'),
+        ('Plymouth')
+        ON CONFLICT DO NOTHING;
+
+        -- Create table listing_categories
+        CREATE TABLE IF NOT EXISTS listing_categories (
+            id SERIAL PRIMARY KEY,
+            listing_id INTEGER REFERENCES listings(id),
+            category_id INTEGER REFERENCES categories(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Create table listing_instruments
+        CREATE TABLE IF NOT EXISTS listing_instruments (
+            id SERIAL PRIMARY KEY,
+            listing_id INTEGER REFERENCES listings(id),
+            instrument_id INTEGER REFERENCES instruments(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Create table listing_locations
+        CREATE TABLE IF NOT EXISTS listing_locations (
+            id SERIAL PRIMARY KEY,
+            listing_id INTEGER REFERENCES listings(id),
+            location_id INTEGER REFERENCES locations(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         -- Insert sample data into listings
-        INSERT INTO listings (user_id, title, description, main_image, banner_image, package_id, categories, instruments, ages) VALUES
-        (1, 'Rock School', 'Learn guitar from the best!', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593401/GTNM-Favicon_1SVG_dwickc.svg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593424/ahmed-rizkhaan-0KyGJK2GlJI-unsplash_mslwqc.jpg', 1, 'Music, Lessons', 'Piano', 'All Ages'),
-        (2, 'Mark Clark', 'Master the guitar with our expert teacher.', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593336/mahyar-mirghasemi-wmms5pSoWZQ-unsplash_zfgvkr.jpg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593348/gabriel-gurrola-2UuhMZEChdc-unsplash_chag56.jpg', 2, 'Music, Lessons', 'Guitar', 'Teens, Adults'),
-        (3, 'Jess Smith', 'Explore your creativity with our guitar classes.', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593391/Girl-Pink-background-1_rcgbcv.jpg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593352/marcus-neto-gioH4gHo0-g-unsplash_ke63rh.jpg', 3, 'Art, Creativity', 'None', 'Kids, Teens')
+        INSERT INTO listings (user_id, title, description, main_image, banner_image, tagline) VALUES
+        (1, 'Rock School', 'Learn guitar from the best!', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593401/GTNM-Favicon_1SVG_dwickc.svg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593424/ahmed-rizkhaan-0KyGJK2GlJI-unsplash_mslwqc.jpg', 'Best Guitar Lessons in Town'),
+        (2, 'Mark Clark', 'Master the guitar with our expert teacher.', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593336/mahyar-mirghasemi-wmms5pSoWZQ-unsplash_zfgvkr.jpg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593348/gabriel-gurrola-2UuhMZEChdc-unsplash_chag56.jpg', 'Top Guitar Instructor'),
+        (3, 'Jess Smith', 'Explore your creativity with our guitar classes.', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593391/Girl-Pink-background-1_rcgbcv.jpg', 'https://res.cloudinary.com/dgilrej1z/image/upload/v1720593352/marcus-neto-gioH4gHo0-g-unsplash_ke63rh.jpg', 'Creative Guitar Lessons')
         ON CONFLICT DO NOTHING;
     `;
 
