@@ -54,8 +54,8 @@ const Login = () => {
 
       if (response.ok) {
         const { token } = await response.json();
-        localStorage.setItem("token", token); // Store the JWT token in localStorage
-        navigate("/dashboard"); // Navigate to the dashboard after registration
+        localStorage.setItem("token", token);
+        navigate("/dashboard");
       } else {
         const errorData = await response.json();
         console.error("Registration error:", errorData.message);

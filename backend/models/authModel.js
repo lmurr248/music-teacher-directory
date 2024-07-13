@@ -82,8 +82,8 @@ const registerUser = (
 
       // Insert the new user into the database
       pool.query(
-        "INSERT INTO users (first_name, last_name, email, password, user_type, salt) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-        [firstName, lastName, email, hashedPassword, userTypeNumber, salt],
+        "INSERT INTO users (first_name, last_name, email, password, user_type) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [firstName, lastName, email, hashedPassword, userTypeNumber],
         (err, result) => {
           if (err) {
             return callback(err);
