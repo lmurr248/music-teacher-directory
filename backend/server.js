@@ -23,10 +23,23 @@ app.use(flash());
 app.use(morgan("dev")); // Morgan for HTTP request logging
 
 // CORS setup
+const whitelist = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://music-teacher-directory-frontend.onrender.com",
+];
+
 const corsOptions = {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Enable all HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+  origin: function (origin, callback) {
+    console.log(`Origin: ${origin}`); // Log the origin for debugging
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      console.log(`Blocked by CORS: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // This allows cookies to be sent
 };
 
 app.use(cors(corsOptions));
