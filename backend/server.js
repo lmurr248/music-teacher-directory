@@ -26,6 +26,7 @@ app.use(morgan("dev")); // Morgan for HTTP request logging
 const whitelist = [
   "http://localhost:3000",
   "http://localhost:5000",
+  "https://music-teacher-directory.onrender.com",
   "https://music-teacher-directory-frontend.onrender.com",
 ];
 
