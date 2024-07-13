@@ -4,6 +4,7 @@ import { fetchListings } from "../../slices/listingsSlice";
 
 import Header from "../Header";
 import ListingCard from "./ListingCard";
+import ListingCardSkeleton from "../ListingCardSkeleton";
 import HomePageSearch from "../searchBars/HomePageSearch";
 
 // Helper function to normalise titles
@@ -22,13 +23,21 @@ const Listings = () => {
     }
   }, [status, dispatch]);
 
-  // Render listings
+  // Render listings or skeleton loaders
   let content;
 
   if (status === "loading") {
-    content = <div>Loading...</div>;
+    // Render skeleton loaders while loading
+    content = (
+      <div className="listing-container">
+        {[1, 2, 3, 4, 5].map((index) => (
+          <ListingCardSkeleton key={index} />
+        ))}
+      </div>
+    );
   } else if (status === "succeeded") {
     console.log("Fetched listings:", listings);
+    // Render actual listings once loaded
     content = (
       <div className="listing-container">
         {listings.map((listing) => (

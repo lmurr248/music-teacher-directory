@@ -1,16 +1,21 @@
-const jwt = require("jsonwebtoken");
+const { verifyToken } = require("../authUtils");
 
-const authenticateToken = (req, res, next) => {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(" ")[1];
 
-  if (token == null) return res.sendStatus(401); // if there isn't any token
+  if (!token) {
+    return res.sendStatus(401); // Unauthorized
+  }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
+  try {
+    const decoded = await verifyToken(token);
+    req.user = decoded;
     next();
-  });
-};
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    res.sendStatus(403); // Forbidden
+  }
+}
 
 module.exports = { authenticateToken };

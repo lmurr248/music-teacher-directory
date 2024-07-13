@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from "react";
-import useInstruments from "../../helpers/useInstruments";
 import fetchAllLocations from "../../helpers/fetchAllLocations";
 import fetchAllInstruments from "../../helpers/fetchAllInstruments";
+import { useNavigate } from "react-router-dom";
 
 const HomePageSearch = () => {
   const [locations, setLocations] = useState([]);
   const [locationsError, setLocationsError] = useState(null);
   const [instruments, setInstruments] = useState([]);
   const [instrumentsError, setInstrumentsError] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedInstrument, setSelectedInstrument] = useState(null);
+  const navigate = useNavigate();
+
+  const handleInstrumentChange = (e) => {
+    setSelectedInstrument(e.target.value);
+  };
+
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value);
+  };
+
+  const handleSearch = () => {
+    navigate(`/search/${selectedLocation}/${selectedInstrument}`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,8 +65,8 @@ const HomePageSearch = () => {
         <div className="search">
           <div className="input-container">
             <p className="x-small white">Location:</p>
-            <select>
-              <option value="" disabled>
+            <select defaultValue="" onChange={handleLocationChange}>
+              <option value="" disabled={!selectedLocation}>
                 Select a location
               </option>
               {locations.map((location) => (
@@ -63,7 +78,7 @@ const HomePageSearch = () => {
           </div>
           <div className="input-container">
             <p className="x-small white">Instrument:</p>
-            <select defaultValue="">
+            <select defaultValue="" onChange={handleInstrumentChange}>
               <option value="" disabled>
                 I want to learn...
               </option>
@@ -74,7 +89,7 @@ const HomePageSearch = () => {
               ))}
             </select>
           </div>
-          <button>Search</button>
+          <button onClick={handleSearch}>Search</button>
         </div>
       </div>
     </div>

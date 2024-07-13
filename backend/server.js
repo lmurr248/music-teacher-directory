@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const session = require("express-session");
@@ -15,63 +16,69 @@ const flash = require("connect-flash");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
+// Middleware setup
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(flash());
+app.use(morgan("dev")); // Morgan for HTTP request logging
 
-const whitelist = [
-  "http://localhost:3000",
-  "http://localhost:5000",
-  "https://music-teacher-directory-frontend.onrender.com",
-];
-
+// CORS setup
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log(`Origin: ${origin}`); // Log the origin for debugging
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      console.log(`Blocked by CORS: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // This allows cookies to be sent
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Enable all HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
 };
 
 app.use(cors(corsOptions));
 
-// Set up session middleware
+// Error handling for CORS
+app.use(function (err, req, res, next) {
+  if (err.message === "Not allowed by CORS") {
+    console.error(`CORS blocked request from ${req.headers.origin}`);
+    res.status(403).json({ error: "CORS request not allowed" });
+  } else {
+    next(err);
+  }
+});
+
+// Error handling for CORS
+app.use(function (err, req, res, next) {
+  if (err.message === "Not allowed by CORS") {
+    console.error(`CORS blocked request from ${req.headers.origin}`);
+    res.status(403).json({ error: "CORS request not allowed" });
+  } else {
+    next(err);
+  }
+});
+
+// Session middleware setup
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Set to true in production!
+    cookie: { secure: false }, // Set to true in production with HTTPS
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use the user routes
-app.use("/api/user", userRoutes);
+// Routes setup
+app.use("/api/user", userRoutes); // User routes
+app.use("/api", authRoutes); // Authentication routes
+app.use("/api/listings", listingRoutes); // Listing routes
+app.use("/api/categories", categoriesRoutes); // Categories routes
+app.use("/api/instruments", instrumentsRoutes); // Instruments routes
+app.use("/api/locations", locationsRoutes); // Locations routes
 
-// Use the auth routes
-app.use("/api", authRoutes);
+// Error handling middleware
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send("Internal Server Error");
+});
 
-// Mount the listing routes
-app.use("/api/listings", listingRoutes);
-
-// Use categories routes
-app.use("/api/categories", categoriesRoutes);
-
-// Use instruments routes
-app.use("/api/instruments", instrumentsRoutes);
-
-// Use locations routes
-app.use("/api/locations", locationsRoutes);
-
-// Start the server on the specified port or default to 5000
-const PORT = 5000;
+// Start server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server has started on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -20,8 +20,6 @@ const ListingCard = ({ listing }) => {
   const displayedCategories = categories.slice(0, 3);
   const extraCategories = categories.length - 3;
 
-  console.log(listing);
-
   return (
     <Link to={`/listing/${normaliseTitle(listing.title)}`}>
       <div key={listing.id} className="card">

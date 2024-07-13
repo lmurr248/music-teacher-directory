@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import Header from "../Header";
 import TeacherDashboard from "./TeacherDashboard";
 import { jwtDecode } from "jwt-decode";
+import ListingCardSkeleton from "../ListingCardSkeleton";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingListings, setLoadingListings] = useState(true);
   const [error, setError] = useState(null);
   const [listings, setListings] = useState([]);
 
@@ -14,7 +16,7 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication token not found");
-        setLoading(false);
+        setLoadingUser(false);
         return;
       }
 
@@ -33,7 +35,7 @@ const Dashboard = () => {
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        setLoadingUser(false);
       }
     };
 
@@ -59,42 +61,41 @@ const Dashboard = () => {
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        setLoadingListings(false);
       }
     };
 
     fetchUserListings();
   }, [user]);
 
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>Error: {error}</div>;
-  // if (!user) return <div>No user data found</div>;
+  // Handle loading state
+  if (loadingUser && !user) {
+    return (
+      <div>
+        <Header />
+        <div>
+          <TeacherDashboard user={user} listings={[]} />
+        </div>
+      </div>
+    );
+  }
 
-  console.log(user);
+  if (loadingListings) {
+    return (
+      <div>
+        <Header />
+        <TeacherDashboard user={user} listings={[]} />
+      </div>
+    );
+  }
 
-  const renderUserContent = () => {
-    if (!user) return <div>Loading user details...</div>;
+  if (error) return <div>Error: {error}</div>;
 
-    switch (user.user_type) {
-      case 1:
-        return (
-          <div>
-            <h1>Admin Dashboard</h1>
-          </div>
-        );
-      case 2:
-        return <TeacherDashboard user={user} listings={listings} />;
-      case 3:
-        return <h1>Student Dashboard</h1>;
-      default:
-        return <div>Unknown user type</div>;
-    }
-  };
-
+  // Render user content once user and listings are loaded
   return (
     <div>
       <Header />
-      <div className="listings">{renderUserContent()}</div>
+      <TeacherDashboard user={user} listings={listings} />
     </div>
   );
 };

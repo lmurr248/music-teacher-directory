@@ -5,6 +5,7 @@ import ListingDetails from "./components/listings/ListingDetails";
 import Login from "./components/Login";
 import Dashboard from "./components/dashboards/Dashboard";
 import AddListing from "./components/listings/AddListing";
+import SearchResults from "./components/listings/SearchResults";
 
 function App() {
   return (
@@ -16,6 +17,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/add-listing" element={<AddListing />} />
+          <Route
+            path="/search/:locationId/:instrumentId"
+            element={<SearchResults />}
+          />
         </Routes>
       </Router>
     </div>

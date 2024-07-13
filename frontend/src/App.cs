@@ -337,9 +337,9 @@ form button:hover {
   background: linear-gradient(239deg, rgb(15, 131, 255) 5%, rgb(0, 78, 162) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0f83ff",endColorstr="#004ea2",GradientType=1);
   color: white;
-  padding: 0rem 0;
+  padding: 1rem 0;
   text-align: center;
-  min-height: 50px;
+  min-height: 50dvh;
   display: flex;
   justify-content: center;
 }
@@ -355,8 +355,8 @@ form button:hover {
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  margin-top: 4rem;
-  margin-bottom: 2rem;
+  margin-top: 6rem;
+  margin-bottom: 3rem;
 }
 .hero-search input,
 .hero-search select {
@@ -371,9 +371,6 @@ form button:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-.hero-search #your-search {
-  margin-right: 2rem;
 }
 .hero-search .search {
   display: flex;
@@ -394,4 +391,4 @@ form button:hover {
   background-color: #0056b3;
 }
 
-/*# sourceMappingURL=App.css.map */
+/*# sourceMappingURL=App.cs.map */

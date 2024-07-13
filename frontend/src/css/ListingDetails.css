@@ -1,5 +1,11 @@
+p {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
 .banner {
   margin-top: 1rem;
+  width: 100%;
 }
 .banner img {
   width: 100%;
@@ -8,25 +14,83 @@
   border-radius: 30px;
 }
 
-main {
+.listing-details-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+  align-items: center;
 }
 
 .profile-image {
-  margin: -7rem 0px 0px 3rem;
+  margin: -6rem 0px 0px 0rem;
 }
 
 .profile-image img {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   object-fit: cover;
   border-radius: 1000px;
   border: solid #f5f5f5 5px;
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.18);
+}
+
+.listing-container-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 85%;
+}
+
+.listing-meta {
+  margin-top: -100px;
+  display: flex;
+  background-color: rgb(255, 255, 255);
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0px 0px 14px 1px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+.listing-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+}
+.listing-title h1 {
+  margin-block-start: 0rem;
+  margin-block-end: 0rem;
+  font-size: 1.5rem;
+  color: #212529;
+}
+
+.listing-info {
+  border-top: solid 1px #c3c3c3;
+  padding: 1rem 0rem 0rem 0rem;
+  display: flex;
+  gap: 2rem;
+  color: #343a40;
+  align-items: center;
+  justify-content: space-between;
+}
+.listing-info .listing-specifics {
+  display: flex;
+  gap: 2rem;
+}
+
+.listing-description {
+  line-height: 1.5rem;
+  font-size: 0.9em;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 /*# sourceMappingURL=ListingDetails.css.map */

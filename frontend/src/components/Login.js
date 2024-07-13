@@ -24,7 +24,7 @@ const Login = () => {
 
       if (response.ok) {
         const { token } = await response.json();
-        localStorage.setItem("token", token); // Store the JWT token in localStorage
+        localStorage.setItem("token", token);
         navigate("/dashboard");
       } else {
         const errorData = await response.json();

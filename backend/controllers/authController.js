@@ -27,10 +27,9 @@ exports.login = (req, res, next) => {
     if (!user)
       return res.status(400).json({ message: "Invalid email or password" });
 
-    req.logIn(user, (err) => {
+    req.login(user, async (err) => {
       if (err) return next(err);
 
-      // Generate a token
       const token = jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_SECRET,
@@ -38,26 +37,15 @@ exports.login = (req, res, next) => {
       );
 
       return res.json({ token });
-    })(req, res, next);
-  });
+    });
+  })(req, res, next);
 };
-
-// exports.login = (req, res, next) => {
-//   passport.authenticate("local", (err, user, info) => {
-//     if (err) return next(err);
-//     if (!user)
-//       return res.status(400).json({ message: "Invalid email or password" });
-//     req.logIn(user, (err) => {
-//       if (err) return next(err);
-//       return res.json(user);
-//     });
-//   })(req, res, next);
-// };
 
 // Logout controller
 exports.logout = (req, res) => {
   req.logout((err) => {
     if (err) {
+      console.error("Error logging out user:", err);
       return res.status(500).json({ error: "Failed to logout" });
     }
     res.status(200).json({ message: "Logout successful" });
