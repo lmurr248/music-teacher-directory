@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Header";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import fetchAllCategories from "../../helpers/fetchAllCategories";
+import fetchAllInstruments from "../../helpers/fetchAllInstruments";
+import fetchAllLocations from "../../helpers/fetchAllLocations";
 
 const AddListing = () => {
   const navigate = useNavigate();
-  const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-  };
+  const { id } = useParams();
 
-  const query = useQuery();
-  const id = query.get("id");
   const [title, setTitle] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
@@ -38,83 +37,75 @@ const AddListing = () => {
 
   // Fetch categories
   useEffect(() => {
-    if (!currentUser || !currentUser.id) return;
-
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/categories");
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const categories = await response.json();
-        setCategories(categories);
+        const data = await fetchAllCategories();
+        setCategories(data);
       } catch (err) {
         console.error(err.message);
       }
     };
-    fetchCategories();
 
+    fetchCategories();
+  }, []);
+
+  // Fetch instruments
+  useEffect(() => {
     const fetchInstruments = async () => {
       try {
-        const response = await fetch("/api/instruments");
-        if (!response.ok) throw new Error("Failed to fetch instruments");
-        const instruments = await response.json();
-        setInstruments(instruments);
+        const data = await fetchAllInstruments();
+        setInstruments(data);
       } catch (err) {
         console.error(err.message);
       }
     };
-    fetchInstruments();
 
+    fetchInstruments();
+  }, []);
+
+  // Fetch locations
+  useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch("/api/locations");
-        if (!response.ok) throw new Error("Failed to fetch locations");
-        const locations = await response.json();
-        setLocations(locations);
+        const data = await fetchAllLocations();
+        setLocations(data);
       } catch (err) {
         console.error(err.message);
       }
     };
+
     fetchLocations();
+  }, []);
 
-    const fetchLocationByListingId = async () => {
+  // Fetch listing by ID
+  useEffect(() => {
+    if (!id || !currentUser.id) return;
+
+    const fetchListing = async () => {
       try {
-        const response = await fetch(`/api/locations/listing/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch location");
-        const location = await response.json();
-        setSelectedLocation(location[0]);
+        const response = await fetch(`/api/listings/${id}`);
+        if (!response.ok) throw new Error("Failed to fetch listing");
+        const listing = await response.json();
+
+        if (listing.user_id !== currentUser.id) {
+          navigate("/add-listing");
+        } else {
+          setTitle(listing.title);
+          setTagline(listing.tagline);
+          setDescription(listing.description);
+          setBannerImage(listing.banner_image);
+          setMainImage(listing.main_image);
+          setSelectedCategories(listing.categories || []);
+          setSelectedInstruments(listing.instruments || []);
+        }
       } catch (err) {
         console.error(err.message);
+        navigate("/add-listing");
       }
     };
-    fetchLocationByListingId();
 
-    if (id) {
-      const fetchListing = async () => {
-        try {
-          const response = await fetch(`/api/listings/${id}`);
-          if (!response.ok) throw new Error("Failed to fetch listing");
-          const listing = await response.json();
-          // Check user_id match before setting state
-          if (listing.user_id !== currentUser.id) {
-            navigate("/add-listing");
-          } else {
-            setTitle(listing.title);
-            setTagline(listing.tagline);
-            setDescription(listing.description);
-            setBannerImage(listing.banner_image);
-            setMainImage(listing.main_image);
-            setSelectedCategories(listing.categories || []);
-            setSelectedInstruments(listing.instruments || []);
-          }
-        } catch (err) {
-          console.error(err.message);
-
-          navigate("/add-listing");
-        }
-      };
-      fetchListing();
-    }
-  }, [currentUser, id, navigate]);
+    fetchListing();
+  }, [id, currentUser, navigate]);
 
   // Handle title input changes
   const handleTitleChange = (e) => {
@@ -227,7 +218,6 @@ const AddListing = () => {
       const updatedListing = await response.json();
       console.log("Updated listing:", updatedListing);
 
-      // Redirect or handle success based on the action (create/update)
       if (id) {
         navigate(`/listing/${id}`);
       } else {
