@@ -50,10 +50,6 @@ const HomePageSearch = () => {
     fetchInstruments();
   }, []);
 
-  // if (locationsError) return <p>Error loading locations: {locationsError}</p>;
-  // if (instrumentsError)
-  //   return <p>Error loading instruments: {instrumentsError}</p>;
-
   return (
     <div className="hero">
       <div className="hero-body">

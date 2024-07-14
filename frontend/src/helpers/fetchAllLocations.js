@@ -1,6 +1,8 @@
 const fetchAllLocations = async () => {
+  const baseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+  console.log("Base URL (locations):", baseUrl);
   try {
-    const response = await fetch("/api/locations");
+    const response = await fetch(`${baseUrl}/api/locations`);
     if (!response.ok) {
       throw new Error("Failed to fetch locations");
     }

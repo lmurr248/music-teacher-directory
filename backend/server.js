@@ -32,7 +32,7 @@ const whitelist = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log(`Origin: ${origin}`); // Log the origin for debugging
+    console.log(`Origin: ${origin}`);
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -40,7 +40,7 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // This allows cookies to be sent
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
