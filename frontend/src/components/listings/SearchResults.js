@@ -26,6 +26,8 @@ const SearchResults = () => {
   const [instrumentsError, setInstrumentsError] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [instrumentsLoading, setInstrumentsLoading] = useState(true);
   const navigate = useNavigate();
 
   const handleInstrumentChange = (e) => {
@@ -47,6 +49,8 @@ const SearchResults = () => {
         setLocations(data);
       } catch (error) {
         setLocationsError(error.message);
+      } finally {
+        setLocationsLoading(false);
       }
     };
 
@@ -60,6 +64,8 @@ const SearchResults = () => {
         setInstruments(data);
       } catch (error) {
         setInstrumentsError(error.message);
+      } finally {
+        setInstrumentsLoading(false);
       }
     };
 
@@ -85,14 +91,16 @@ const SearchResults = () => {
   }, [instrumentId]);
 
   // Find location name based on selectedLocation
-  const selectedLocationName =
-    locations.find((loc) => loc.id === selectedLocation)?.name ||
-    "Unknown Location";
+  const selectedLocationName = locationsLoading
+    ? "Loading..."
+    : locations.find((loc) => loc.id === parseInt(selectedLocation))?.name ||
+      "Unknown Location";
 
   // Find instrument name based on selectedInstrument
-  const selectedInstrumentName =
-    instruments.find((inst) => inst.id === selectedInstrument)?.name ||
-    "Unknown Instrument";
+  const selectedInstrumentName = instrumentsLoading
+    ? "Loading..."
+    : instruments.find((inst) => inst.id === parseInt(selectedInstrument))
+        ?.name || "Unknown Instrument";
 
   // Render listings or skeleton loaders
   let content;
@@ -158,7 +166,9 @@ const SearchResults = () => {
       </div>
       <main>
         <h2 className="centered mg-top">
-          Showing {selectedInstrumentName} teachers in {selectedLocationName}
+          {locationsLoading || instrumentsLoading
+            ? "Loading search results..."
+            : `Showing ${selectedInstrumentName} teachers in ${selectedLocationName}`}
         </h2>
         {content}
       </main>
