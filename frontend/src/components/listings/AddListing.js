@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Header";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import fetchAllCategories from "../../helpers/fetchAllCategories";
 import fetchAllInstruments from "../../helpers/fetchAllInstruments";
 import fetchAllLocations from "../../helpers/fetchAllLocations";
+import DOMPurify from "dompurify";
 
 const AddListing = () => {
   const navigate = useNavigate();
@@ -35,7 +36,6 @@ const AddListing = () => {
     }
   }, [navigate]);
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -45,11 +45,9 @@ const AddListing = () => {
         console.error(err.message);
       }
     };
-
     fetchCategories();
   }, []);
 
-  // Fetch instruments
   useEffect(() => {
     const fetchInstruments = async () => {
       try {
@@ -59,11 +57,9 @@ const AddListing = () => {
         console.error(err.message);
       }
     };
-
     fetchInstruments();
   }, []);
 
-  // Fetch locations
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -73,11 +69,9 @@ const AddListing = () => {
         console.error(err.message);
       }
     };
-
     fetchLocations();
   }, []);
 
-  // Fetch listing by ID
   useEffect(() => {
     if (!id || !currentUser.id) return;
 
@@ -107,21 +101,22 @@ const AddListing = () => {
     fetchListing();
   }, [id, currentUser, navigate]);
 
-  // Handle title input changes
+  const sanitizeInput = (input) => {
+    return DOMPurify.sanitize(input);
+  };
+
   const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+    setTitle(sanitizeInput(e.target.value));
   };
 
   const handleTaglineChange = (e) => {
-    setTagline(e.target.value);
+    setTagline(sanitizeInput(e.target.value));
   };
 
-  // Handle description input changes
   const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
+    setDescription(sanitizeInput(e.target.value));
   };
 
-  // Handle banner image changes
   const handleBannerImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -135,7 +130,6 @@ const AddListing = () => {
     }
   };
 
-  // Handle main image changes
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -145,7 +139,6 @@ const AddListing = () => {
     reader.readAsDataURL(file);
   };
 
-  // Handle category selection changes
   const handleSelectCategories = (e) => {
     const options = e.target.options;
     const selected = [];
@@ -157,7 +150,6 @@ const AddListing = () => {
     setSelectedCategories(selected);
   };
 
-  // Handle instrument selection changes
   const handleSelectInstruments = (e) => {
     const options = e.target.options;
     const selected = [];
@@ -170,7 +162,7 @@ const AddListing = () => {
   };
 
   const handleNewLocation = (e) => {
-    setNewLocation(e.target.value);
+    setNewLocation(sanitizeInput(e.target.value));
   };
 
   const handleLocationChange = (e) => {
@@ -183,11 +175,11 @@ const AddListing = () => {
     try {
       const userId = currentUser.id;
       const newLocationData = newLocation ? { name: newLocation } : null;
-      let endpoint = "/api/listings";
+      let endpoint = `${process.env.REACT_APP_API_BASE_URL}/api/listings`;
       let method = "POST";
 
       if (id) {
-        endpoint = `/api/listings/${id}`;
+        endpoint = `${process.env.REACT_APP_API_BASE_URL}/api/listings/${id}`;
         method = "PUT";
       }
 
@@ -199,20 +191,23 @@ const AddListing = () => {
         },
         body: JSON.stringify({
           user_id: userId,
-          title,
-          description,
+          title: sanitizeInput(title),
+          description: sanitizeInput(description),
           banner_image: bannerImage,
           main_image: mainImage,
           categories: selectedCategories,
           instruments: selectedInstruments,
           location: selectedLocation,
-          new_location: newLocationData,
-          tagline,
+          new_location: newLocationData
+            ? sanitizeInput(newLocationData.name)
+            : null,
+          tagline: sanitizeInput(tagline),
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create/update listing");
+        const errorText = await response.text();
+        throw new Error(`Failed to create/update listing: ${errorText}`);
       }
 
       const updatedListing = await response.json();
@@ -253,7 +248,7 @@ const AddListing = () => {
               name="tagline"
               value={tagline}
               onChange={handleTaglineChange}
-              placeholder="Listing title"
+              placeholder="Listing tagline"
               maxLength={50}
               required
             />
@@ -264,7 +259,7 @@ const AddListing = () => {
               name="description"
               value={description}
               onChange={handleDescriptionChange}
-              placeholder="Enter the main text for your listings here..."
+              placeholder="Enter the main text for your listing here..."
               required
             ></textarea>
             <label htmlFor="banner_image">Banner Image</label>
