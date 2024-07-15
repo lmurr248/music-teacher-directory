@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const initialState = {
   listings: [],
@@ -11,7 +12,7 @@ const initialState = {
 export const fetchListings = createAsyncThunk(
   "listings/fetchListings",
   async () => {
-    const response = await axios.get("http://localhost:5000/api/listings");
+    const response = await axios.get(`${baseUrl}/api/listings`);
     return response.data;
   }
 );
@@ -19,9 +20,7 @@ export const fetchListings = createAsyncThunk(
 export const fetchListingById = createAsyncThunk(
   "listings/fetchListingById",
   async (id) => {
-    const response = await axios.get(
-      `http://localhost:5000/api/listings/${id}`
-    );
+    const response = await axios.get(`${baseUrl}/api/listings/${id}`);
     return response.data;
   }
 );
