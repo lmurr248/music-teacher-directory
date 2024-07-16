@@ -55,23 +55,13 @@ app.use(function (err, req, res, next) {
   }
 });
 
-// Error handling for CORS
-app.use(function (err, req, res, next) {
-  if (err.message === "Not allowed by CORS") {
-    console.error(`CORS blocked request from ${req.headers.origin}`);
-    res.status(403).json({ error: "CORS request not allowed" });
-  } else {
-    next(err);
-  }
-});
-
 // Session middleware setup
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Set to true in production with HTTPS
+    cookie: { secure: false }, // Not using secure cookies
   })
 );
 app.use(passport.initialize());
@@ -91,7 +81,7 @@ app.use(function (err, req, res, next) {
   res.status(500).send("Internal Server Error");
 });
 
-// Start server
+// Start HTTP server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

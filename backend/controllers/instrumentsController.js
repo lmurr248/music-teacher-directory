@@ -25,3 +25,18 @@ exports.createInstrument = async (req, res) => {
     console.error(err.message);
   }
 };
+
+// Get all instruments with associated listings
+exports.getInstrumentsWithListings = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT DISTINCT i.id, i.name
+      FROM instruments i
+      JOIN listing_instruments li ON i.id = li.instrument_id
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    console.error(err.message);
+  }
+};

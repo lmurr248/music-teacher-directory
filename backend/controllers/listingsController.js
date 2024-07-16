@@ -2,8 +2,39 @@ const pool = require("../db");
 
 // Get all listings
 exports.getListings = async (req, res) => {
+  const { locationId, instrumentId } = req.query;
   try {
-    const listings = await pool.query("SELECT * FROM listings");
+    let query = `
+      SELECT l.*, 
+        array_agg(DISTINCT c.id) as category_ids,
+        array_agg(DISTINCT i.id) as instrument_ids,
+        array_agg(DISTINCT loc.id) as location_ids
+      FROM listings l
+      LEFT JOIN listing_categories lc ON l.id = lc.listing_id
+      LEFT JOIN categories c ON lc.category_id = c.id
+      LEFT JOIN listing_instruments li ON l.id = li.listing_id
+      LEFT JOIN instruments i ON li.instrument_id = i.id
+      LEFT JOIN listing_locations ll ON l.id = ll.listing_id
+      LEFT JOIN locations loc ON ll.location_id = loc.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (locationId) {
+      query += ` AND loc.id = $${params.length + 1}`;
+      params.push(locationId);
+    }
+
+    if (instrumentId) {
+      query += ` AND i.id = $${params.length + 1}`;
+      params.push(instrumentId);
+    }
+
+    query += `
+      GROUP BY l.id
+    `;
+
+    const listings = await pool.query(query, params);
     res.json(listings.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -47,6 +78,42 @@ exports.getListingsByUserId = async (req, res) => {
   } catch (err) {
     console.error(`Error fetching listings by user ID: ${err.message}`);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Get all locations with associated listings
+exports.getLocationsWithListings = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT DISTINCT loc.id, loc.name
+      FROM locations loc
+      JOIN listing_locations ll ON loc.id = ll.location_id
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(
+      `Error fetching locations with listings: ${err.message}`,
+      err
+    );
+    res.status(500).json({ error: `Server error: ${err.message}` });
+  }
+};
+
+// Get all instruments with associated listings
+exports.getInstrumentsWithListings = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT DISTINCT i.id, i.name
+      FROM instruments i
+      JOIN listing_instruments li ON i.id = li.instrument_id
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(
+      `Error fetching instruments with listings: ${err.message}`,
+      err
+    );
+    res.status(500).json({ error: `Server error: ${err.message}` });
   }
 };
 

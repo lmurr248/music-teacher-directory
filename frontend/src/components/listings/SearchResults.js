@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchListings } from "../../slices/listingsSlice";
-
 import Header from "../Header";
 import ListingCard from "./ListingCard";
 import ListingCardSkeleton from "../ListingCardSkeleton";
-
 import { useNavigate, useParams } from "react-router-dom";
-import fetchAllLocations from "../../helpers/fetchAllLocations";
-import fetchAllInstruments from "../../helpers/fetchAllInstruments";
-
-// Helper function to normalise titles
-export const normaliseTitle = (title) =>
-  title.toLowerCase().replace(/\s/g, "-");
+import fetchLocationsWithListings from "../../helpers/fetchLocationsWithListings";
+import fetchInstrumentsWithListings from "../../helpers/fetchInstrumentsWithListings";
 
 const SearchResults = () => {
   const { locationId, instrumentId } = useParams();
@@ -24,8 +18,10 @@ const SearchResults = () => {
   const [locationsError, setLocationsError] = useState(null);
   const [instruments, setInstruments] = useState([]);
   const [instrumentsError, setInstrumentsError] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(locationId || "");
+  const [selectedInstrument, setSelectedInstrument] = useState(
+    instrumentId || ""
+  );
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [instrumentsLoading, setInstrumentsLoading] = useState(true);
   const navigate = useNavigate();
@@ -45,7 +41,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchAllLocations();
+        const data = await fetchLocationsWithListings();
         setLocations(data);
       } catch (error) {
         setLocationsError(error.message);
@@ -60,7 +56,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchInstruments = async () => {
       try {
-        const data = await fetchAllInstruments();
+        const data = await fetchInstrumentsWithListings();
         setInstruments(data);
       } catch (error) {
         setInstrumentsError(error.message);
@@ -73,10 +69,8 @@ const SearchResults = () => {
   }, []);
 
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchListings());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchListings({ locationId, instrumentId }));
+  }, [locationId, instrumentId, dispatch]);
 
   useEffect(() => {
     if (locationId) {
@@ -119,9 +113,13 @@ const SearchResults = () => {
     // Render actual listings once loaded
     content = (
       <div className="listing-container">
-        {listings.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
+        {listings.length > 0 ? (
+          listings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))
+        ) : (
+          <p>No listings found for the selected filters.</p>
+        )}
       </div>
     );
   } else if (status === "failed") {
@@ -137,7 +135,11 @@ const SearchResults = () => {
             <h4 id="your-search">Your search:</h4>
             <div className="input-container">
               <p className="x-small white">Location:</p>
-              <select value={selectedLocation} onChange={handleLocationChange}>
+              <select
+                value={selectedLocation}
+                onChange={handleLocationChange}
+                required
+              >
                 <option value="">Select a location</option>
                 {locations.map((location) => (
                   <option key={location.id} value={location.id}>
@@ -145,12 +147,14 @@ const SearchResults = () => {
                   </option>
                 ))}
               </select>
+              {locationsError && <p className="error">{locationsError}</p>}
             </div>
             <div className="input-container">
               <p className="x-small white">Instrument:</p>
               <select
                 value={selectedInstrument}
                 onChange={handleInstrumentChange}
+                required
               >
                 <option value="">I want to learn...</option>
                 {instruments.map((instrument) => (
@@ -159,8 +163,14 @@ const SearchResults = () => {
                   </option>
                 ))}
               </select>
+              {instrumentsError && <p className="error">{instrumentsError}</p>}
             </div>
-            <button onClick={handleSearch}>Search</button>
+            <button
+              onClick={handleSearch}
+              disabled={!selectedLocation || !selectedInstrument}
+            >
+              Search
+            </button>
           </div>
         </div>
       </div>

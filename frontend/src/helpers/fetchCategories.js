@@ -13,9 +13,7 @@ const useCategories = (listingId) => {
         }
         const data = await response.json();
         setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
+      } catch (error) {}
     };
 
     fetchCategories();

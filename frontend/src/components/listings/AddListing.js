@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Header";
 import { useNavigate, useParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // Corrected import
 import fetchAllCategories from "../../helpers/fetchAllCategories";
 import fetchAllInstruments from "../../helpers/fetchAllInstruments";
 import fetchAllLocations from "../../helpers/fetchAllLocations";
@@ -29,8 +29,13 @@ const AddListing = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token);
-      setCurrentUser(decoded);
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUser(decoded);
+      } catch (error) {
+        console.error("Invalid token:", error);
+        navigate("/login");
+      }
     } else {
       navigate("/login");
     }
@@ -75,11 +80,16 @@ const AddListing = () => {
   useEffect(() => {
     if (!id || !currentUser.id) return;
 
+    console.log("Fetching listing with ID:", id);
+    console.log("Current User ID:", currentUser.id);
+
     const fetchListing = async () => {
       try {
         const response = await fetch(`/api/listings/${id}`);
         if (!response.ok) throw new Error("Failed to fetch listing");
         const listing = await response.json();
+
+        console.log("Fetched Listing:", listing);
 
         if (listing.user_id !== currentUser.id) {
           navigate("/add-listing");

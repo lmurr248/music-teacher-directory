@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import fetchAllLocations from "../../helpers/fetchAllLocations";
-import fetchAllInstruments from "../../helpers/fetchAllInstruments";
+import fetchLocationsWithListings from "../../helpers/fetchLocationsWithListings";
+import fetchInstrumentsWithListings from "../../helpers/fetchInstrumentsWithListings";
 import { useNavigate } from "react-router-dom";
 
 const HomePageSearch = () => {
@@ -21,13 +21,15 @@ const HomePageSearch = () => {
   };
 
   const handleSearch = () => {
-    navigate(`/search/${selectedLocation}/${selectedInstrument}`);
+    if (selectedLocation && selectedInstrument) {
+      navigate(`/search/${selectedLocation}/${selectedInstrument}`);
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchAllLocations();
+        const data = await fetchLocationsWithListings();
         setLocations(data);
       } catch (error) {
         setLocationsError(error.message);
@@ -40,7 +42,7 @@ const HomePageSearch = () => {
   useEffect(() => {
     const fetchInstruments = async () => {
       try {
-        const data = await fetchAllInstruments();
+        const data = await fetchInstrumentsWithListings();
         setInstruments(data);
       } catch (error) {
         setInstrumentsError(error.message);
@@ -61,8 +63,8 @@ const HomePageSearch = () => {
         <div className="search">
           <div className="input-container">
             <p className="x-small white">Location:</p>
-            <select defaultValue="" onChange={handleLocationChange}>
-              <option value="" disabled={!selectedLocation}>
+            <select defaultValue="" onChange={handleLocationChange} required>
+              <option value="" disabled>
                 Select a location
               </option>
               {locations.map((location) => (
@@ -71,10 +73,11 @@ const HomePageSearch = () => {
                 </option>
               ))}
             </select>
+            {locationsError && <p className="error">{locationsError}</p>}
           </div>
           <div className="input-container">
             <p className="x-small white">Instrument:</p>
-            <select defaultValue="" onChange={handleInstrumentChange}>
+            <select defaultValue="" onChange={handleInstrumentChange} required>
               <option value="" disabled>
                 I want to learn...
               </option>
@@ -84,8 +87,14 @@ const HomePageSearch = () => {
                 </option>
               ))}
             </select>
+            {instrumentsError && <p className="error">{instrumentsError}</p>}
           </div>
-          <button onClick={handleSearch}>Search</button>
+          <button
+            onClick={handleSearch}
+            disabled={!selectedLocation || !selectedInstrument}
+          >
+            Search
+          </button>
         </div>
       </div>
     </div>

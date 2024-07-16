@@ -11,8 +11,17 @@ const initialState = {
 
 export const fetchListings = createAsyncThunk(
   "listings/fetchListings",
-  async () => {
-    const response = await axios.get(`${baseUrl}/api/listings`);
+  async ({ locationId, instrumentId } = {}) => {
+    // Added default parameter to handle undefined
+    let query = "";
+    if (locationId && instrumentId) {
+      query = `?locationId=${locationId}&instrumentId=${instrumentId}`;
+    } else if (locationId) {
+      query = `?locationId=${locationId}`;
+    } else if (instrumentId) {
+      query = `?instrumentId=${instrumentId}`;
+    }
+    const response = await axios.get(`${baseUrl}/api/listings${query}`);
     return response.data;
   }
 );
@@ -27,7 +36,12 @@ export const fetchListingById = createAsyncThunk(
 
 const listingsSlice = createSlice({
   name: "listings",
-  initialState,
+  initialState: {
+    listings: [],
+    listing: null,
+    status: "idle",
+    error: null,
+  },
   reducers: {
     clearSingleListing(state) {
       state.singleListing = null;

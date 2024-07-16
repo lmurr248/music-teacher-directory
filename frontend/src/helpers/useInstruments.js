@@ -13,9 +13,7 @@ const useInstruments = (listingId) => {
         }
         const data = await response.json();
         setInstruments(data);
-      } catch (error) {
-        console.error("Error fetching instruments:", error);
-      }
+      } catch (error) {}
     };
 
     fetchInstruments();

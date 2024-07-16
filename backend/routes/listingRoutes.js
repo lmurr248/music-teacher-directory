@@ -6,6 +6,18 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// GET locations with associated listings
+router.get(
+  "/locations-with-listings",
+  listingsController.getLocationsWithListings
+);
+
+// GET instruments with associated listings
+router.get(
+  "/instruments-with-listings",
+  listingsController.getInstrumentsWithListings
+);
+
 // GET all listings
 router.get("/", listingsController.getListings);
 

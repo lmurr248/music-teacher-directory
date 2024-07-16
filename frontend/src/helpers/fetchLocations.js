@@ -13,9 +13,7 @@ const useLocations = (listingId) => {
         }
         const data = await response.json();
         setLocations(data);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
+      } catch (error) {}
     };
 
     fetchLocations();
